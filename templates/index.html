@@ -14,7 +14,7 @@
         <div class="card h-100 {% if task.is_overdue %}border-danger{% endif %}">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">{{ task.title }}</h5>
-                <span class="badge {% if task.status == 'completed' %}bg-success{% elif task.status == 'in_progress' %}bg-warning{% else %}bg-secondary{% endif %}">
+                <span class="badge {% if task.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">
                     {{ task.status }}
                 </span>
             </div>
@@ -23,8 +23,8 @@
                 <div class="small text-muted">
                     <p>Created: {{ task.created_time.strftime('%Y-%m-%d %H:%M') }}</p>
                     <p>Due: {{ task.due_time.strftime('%Y-%m-%d %H:%M') }}</p>
-                    {% if task.finished_time %}
-                    <p>Finished: {{ task.finished_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% if task.status == 'completed' and task.finished_time %}
+                    <p class="text-success">Finished: {{ task.finished_time.strftime('%Y-%m-%d %H:%M') }}</p>
                     {% endif %}
                     {% if current_user.is_admin %}
                     <p>Assigned to: {{ task.user.username }}</p>

@@ -109,12 +109,21 @@ def edit_task(task_id):
     if request.method == 'POST':
         task.title = request.form['title']
         task.description = request.form['description']
-        task.status = request.form['status']
-        task.due_time = datetime.strptime(request.form['due_time'], '%Y-%m-%dT%H:%M')
-        if task.status == 'completed' and not task.finished_time:
+        new_status = request.form['status']
+        
+        # Handle status change and finished time
+        if new_status == 'completed' and task.status != 'completed':
             task.finished_time = datetime.utcnow()
+        elif new_status == 'pending' and task.status == 'completed':
+            task.finished_time = None
+            
+        task.status = new_status
+        task.due_time = datetime.strptime(request.form['due_time'], '%Y-%m-%dT%H:%M')
+        
         db.session.commit()
+        flash('Task updated successfully!', 'success')
         return redirect(url_for('index'))
+        
     overdue_count = get_overdue_count()
     return render_template('task_form.html', task=task, overdue_count=overdue_count)
 

@@ -20,12 +20,17 @@
                     {% if task is defined %}
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" name="status">
+                        <select class="form-select" id="status" name="status" onchange="updateFinishTime(this)">
                             <option value="pending" {{ 'selected' if task.status == 'pending' else '' }}>Pending</option>
-                            <option value="in_progress" {{ 'selected' if task.status == 'in_progress' else '' }}>In Progress</option>
                             <option value="completed" {{ 'selected' if task.status == 'completed' else '' }}>Completed</option>
                         </select>
                     </div>
+                    {% if task.finished_time %}
+                    <div class="mb-3">
+                        <label class="form-label">Finished Time</label>
+                        <p class="form-control-static">{{ task.finished_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    {% endif %}
                     {% else %}
                     <input type="hidden" name="status" value="pending">
                     {% endif %}
