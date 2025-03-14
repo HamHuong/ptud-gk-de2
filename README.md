@@ -14,6 +14,6 @@
 
 ## Hướng dẫn cài đặt
 1. Clone repo: `git clone https://github.com/Hamhuong/ptud-gk-de-2.git`
-2. Cài đặt: `pip install flask`
+2. Cài đặt: `pip install -r requirement.txt`
 3. Chạy: `python app.py`
-4. Truy cập: `http://localhost:5000`
+4. Truy cập: `(http://127.0.0.1:5000)`
