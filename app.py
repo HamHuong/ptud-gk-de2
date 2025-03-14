@@ -4,6 +4,7 @@ from models import db, User, Task
 from datetime import datetime
 import os
 import requests
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'  # Change this in production
@@ -20,18 +21,40 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 def get_random_avatar():
-    return f"https://avatar-placeholder.iran.liara.run/public/{datetime.now().timestamp()}"
+    # Using DiceBear's API for reliable avatar generation
+    styles = ['adventurer', 'avataaars', 'bottts', 'pixel-art']
+    style = random.choice(styles)
+    seed = datetime.now().timestamp()
+    return f"https://api.dicebear.com/7.x/{style}/svg?seed={seed}"
 
 def get_overdue_count():
     if current_user.is_authenticated:
-        tasks = Task.query.filter_by(user_id=current_user.id).all() if not current_user.is_admin else Task.query.all()
-        return sum(1 for task in tasks if task.is_overdue)
-    return 0
+        if current_user.is_admin:
+            # Admin sees overdue count for all tasks
+            tasks = Task.query.all()
+        else:
+            # Regular users only see their own overdue count
+            tasks = Task.query.filter_by(user_id=current_user.id).all()
+        
+        now = datetime.now()
+        overdue_tasks = [task for task in tasks if task.is_overdue]
+        return {
+            'count': len(overdue_tasks),
+            'urgent': sum(1 for task in overdue_tasks if (now - task.due_time).days >= 3),
+            'recent': sum(1 for task in overdue_tasks if (now - task.due_time).days < 3)
+        }
+    return {'count': 0, 'urgent': 0, 'recent': 0}
 
 @app.route('/')
 @login_required
 def index():
-    tasks = Task.query.filter_by(user_id=current_user.id).all() if not current_user.is_admin else Task.query.all()
+    if current_user.is_admin:
+        # Admin sees all tasks
+        tasks = Task.query.all()
+    else:
+        # Regular users only see their own tasks
+        tasks = Task.query.filter_by(user_id=current_user.id).all()
+    
     overdue_count = get_overdue_count()
     return render_template('index.html', tasks=tasks, overdue_count=overdue_count)
 
@@ -48,19 +71,35 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        if User.query.filter_by(username=request.form['username']).first():
-            flash('Username already exists')
+        username = request.form['username']
+        email = request.form['email']
+        
+        # Check if username exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'error')
             return redirect(url_for('register'))
         
-        user = User(
-            username=request.form['username'],
-            email=request.form['email'],
-            avatar_url=get_random_avatar()
-        )
-        user.set_password(request.form['password'])
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('login'))
+        # Check if email exists
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered', 'error')
+            return redirect(url_for('register'))
+        
+        try:
+            user = User(
+                username=username,
+                email=email,
+                avatar_url=get_random_avatar()
+            )
+            user.set_password(request.form['password'])
+            db.session.add(user)
+            db.session.commit()
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred during registration. Please try again.', 'error')
+            return redirect(url_for('register'))
+            
     return render_template('register.html', overdue_count=0)
 
 @app.route('/logout')
@@ -74,16 +113,20 @@ def logout():
 def new_task():
     if request.method == 'POST':
         try:
-            print("Form data:", request.form)
-            
             due_time_str = request.form['due_time']
             due_time = datetime.strptime(due_time_str, '%Y-%m-%dT%H:%M')
+            
+            # Ensure regular users can only create tasks for themselves
+            if current_user.is_admin:
+                user_id = int(request.form.get('user_id', current_user.id))
+            else:
+                user_id = current_user.id
             
             task = Task(
                 title=request.form['title'],
                 description=request.form['description'],
                 due_time=due_time,
-                user_id=current_user.id if not current_user.is_admin else int(request.form.get('user_id', current_user.id))
+                user_id=user_id
             )
             db.session.add(task)
             db.session.commit()
@@ -94,7 +137,8 @@ def new_task():
             db.session.rollback()
             flash('Error creating task: ' + str(e), 'error')
             return redirect(url_for('new_task'))
-            
+    
+    # Only fetch users list if current user is admin
     users = User.query.all() if current_user.is_admin else None
     overdue_count = get_overdue_count()
     return render_template('task_form.html', users=users, overdue_count=overdue_count)
@@ -113,7 +157,7 @@ def edit_task(task_id):
         
         # Handle status change and finished time
         if new_status == 'completed' and task.status != 'completed':
-            task.finished_time = datetime.utcnow()
+            task.finished_time = datetime.now()
         elif new_status == 'pending' and task.status == 'completed':
             task.finished_time = None
             
@@ -142,7 +186,7 @@ def complete_task(task_id):
     task = Task.query.get_or_404(task_id)
     if current_user.is_admin or task.user_id == current_user.id:
         task.status = 'completed'
-        task.finished_time = datetime.utcnow()
+        task.finished_time = datetime.now()
         db.session.commit()
         flash('Task marked as completed!', 'success')
     return redirect(url_for('index'))

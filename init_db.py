@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, get_random_avatar
 from models import User
 
 def init_db():
@@ -13,7 +13,7 @@ def init_db():
                 username='admin',
                 email='admin@example.com',
                 is_admin=True,
-                avatar_url="https://avatar-placeholder.iran.liara.run/public"
+                avatar_url=get_random_avatar()
             )
             admin.set_password('admin123')
             db.session.add(admin)

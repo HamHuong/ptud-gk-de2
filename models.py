@@ -10,7 +10,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    avatar_url = db.Column(db.String(200), default="https://avatar-placeholder.iran.liara.run/public")
+    avatar_url = db.Column(db.String(200), default="https://api.dicebear.com/7.x/avataaars/svg?seed=default")
     is_admin = db.Column(db.Boolean, default=False)
     tasks = db.relationship('Task', backref='user', lazy=True)
 
@@ -25,7 +25,7 @@ class Task(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     status = db.Column(db.String(20), default='pending')  # pending, completed
-    created_time = db.Column(db.DateTime, default=datetime.utcnow)
+    created_time = db.Column(db.DateTime, default=datetime.now)
     due_time = db.Column(db.DateTime)
     finished_time = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -33,5 +33,5 @@ class Task(db.Model):
     @property
     def is_overdue(self):
         if self.due_time and self.status != 'completed':
-            return datetime.utcnow() > self.due_time
+            return datetime.now() > self.due_time
         return False 
