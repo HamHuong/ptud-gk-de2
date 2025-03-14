@@ -1,19 +1,92 @@
-# PTUD-GK-DE-2: Ứng dụng quản lý công việc
+# Task Management Application
 
-## Thông tin cá nhân
-- Họ tên: Kiều Trương Hàm Hương
-- MSSV: 22719241
+A Flask-based task management application that allows users to create, manage, and track tasks.
 
+## Prerequisites
 
-## Mô tả project
-Ứng dụng quản lý công việc bằng Flask, SQLite3:
-- Admin: Quản lý toàn bộ công việc.
-- User: Quản lý công việc cá nhân, upload avatar.
-- Giao diện: Single Column.
-- Chức năng bổ sung: Hiển thị số công việc trễ hạn.
+- Python 3.x installed on your system
+- Git (optional, for cloning the repository)
 
-## Hướng dẫn cài đặt
-1. Clone repo: `git clone https://github.com/Hamhuong/ptud-gk-de-2.git`
-2. Cài đặt: `pip install flask`
-3. Chạy: `python app.py`
-4. Truy cập: `http://localhost:5000`
+## Getting Started
+
+1. Clone the repository (if you haven't already):
+   ```bash
+   git clone https://github.com/HamHuong/ptud-gk-de2.git
+   cd ptud-gk-de2
+   ```
+
+2. Running the Application
+
+   ### On Windows:
+   Simply double-click the `run.bat` file or run it from the command prompt:
+   ```cmd
+   run.bat
+   ```
+
+   ### On Unix/Linux/MacOS:
+   Execute the shell script:
+   ```bash
+   ./run.sh
+   ```
+
+   The scripts will automatically:
+   - Check if Python is installed
+   - Create a virtual environment if it doesn't exist
+   - Install all required dependencies
+   - Initialize the database
+   - Start the Flask application
+
+3. Access the Application
+   - Open your web browser and navigate to: http://localhost:5000
+   - Default admin credentials:
+     - Username: admin
+     - Password: admin123
+
+## Manual Setup (if scripts don't work)
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+
+2. Activate the virtual environment:
+   - Windows:
+     ```cmd
+     venv\Scripts\activate
+     ```
+   - Unix/Linux/MacOS:
+     ```bash
+     source venv/bin/activate
+     ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Initialize the database:
+   ```bash
+   python init_db.py
+   ```
+
+5. Run the application:
+   ```bash
+   python app.py
+   ```
+
+## Features
+
+- Task creation and management
+- Task status tracking
+- Admin dashboard
+- User authentication
+- Task completion time tracking
+
+## Troubleshooting
+
+If you encounter any issues:
+
+1. Make sure Python 3.x is installed and added to your system PATH
+2. Ensure all dependencies are properly installed
+3. Check if the virtual environment is activated
+4. Verify that the database is properly initialized
