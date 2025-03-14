@@ -17,16 +17,22 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 def get_random_avatar():
     return f"https://avatar-placeholder.iran.liara.run/public/{datetime.now().timestamp()}"
+
+def get_overdue_count():
+    if current_user.is_authenticated:
+        tasks = Task.query.filter_by(user_id=current_user.id).all() if not current_user.is_admin else Task.query.all()
+        return sum(1 for task in tasks if task.is_overdue)
+    return 0
 
 @app.route('/')
 @login_required
 def index():
     tasks = Task.query.filter_by(user_id=current_user.id).all() if not current_user.is_admin else Task.query.all()
-    overdue_count = sum(1 for task in tasks if task.is_overdue)
+    overdue_count = get_overdue_count()
     return render_template('index.html', tasks=tasks, overdue_count=overdue_count)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -37,7 +43,7 @@ def login():
             login_user(user)
             return redirect(url_for('index'))
         flash('Invalid username or password')
-    return render_template('login.html')
+    return render_template('login.html', overdue_count=0)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -55,7 +61,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
-    return render_template('register.html')
+    return render_template('register.html', overdue_count=0)
 
 @app.route('/logout')
 @login_required
@@ -67,17 +73,31 @@ def logout():
 @login_required
 def new_task():
     if request.method == 'POST':
-        task = Task(
-            title=request.form['title'],
-            description=request.form['description'],
-            due_time=datetime.strptime(request.form['due_time'], '%Y-%m-%dT%H:%M'),
-            user_id=current_user.id if not current_user.is_admin else int(request.form['user_id'])
-        )
-        db.session.add(task)
-        db.session.commit()
-        return redirect(url_for('index'))
+        try:
+            print("Form data:", request.form)
+            
+            due_time_str = request.form['due_time']
+            due_time = datetime.strptime(due_time_str, '%Y-%m-%dT%H:%M')
+            
+            task = Task(
+                title=request.form['title'],
+                description=request.form['description'],
+                due_time=due_time,
+                user_id=current_user.id if not current_user.is_admin else int(request.form.get('user_id', current_user.id))
+            )
+            db.session.add(task)
+            db.session.commit()
+            flash('Task created successfully!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            print("Error creating task:", str(e))
+            db.session.rollback()
+            flash('Error creating task: ' + str(e), 'error')
+            return redirect(url_for('new_task'))
+            
     users = User.query.all() if current_user.is_admin else None
-    return render_template('task_form.html', users=users)
+    overdue_count = get_overdue_count()
+    return render_template('task_form.html', users=users, overdue_count=overdue_count)
 
 @app.route('/task/<int:task_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -95,7 +115,8 @@ def edit_task(task_id):
             task.finished_time = datetime.utcnow()
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('task_form.html', task=task)
+    overdue_count = get_overdue_count()
+    return render_template('task_form.html', task=task, overdue_count=overdue_count)
 
 @app.route('/task/<int:task_id>/delete')
 @login_required

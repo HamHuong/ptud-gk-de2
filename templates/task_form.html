@@ -5,10 +5,10 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="text-center">{{ task is defined and task.id ? 'Edit Task' : 'New Task' }}</h3>
+                <h3 class="text-center">{% if task is defined and task.id %}Edit Task{% else %}New Task{% endif %}</h3>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form method="POST" action="{{ url_for('new_task') if not task else url_for('edit_task', task_id=task.id) }}">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
                         <input type="text" class="form-control" id="title" name="title" value="{{ task.title if task is defined else '' }}" required>
@@ -26,6 +26,8 @@
                             <option value="completed" {{ 'selected' if task.status == 'completed' else '' }}>Completed</option>
                         </select>
                     </div>
+                    {% else %}
+                    <input type="hidden" name="status" value="pending">
                     {% endif %}
                     <div class="mb-3">
                         <label for="due_time" class="form-label">Due Time</label>
@@ -37,13 +39,13 @@
                         <label for="user_id" class="form-label">Assign To</label>
                         <select class="form-select" id="user_id" name="user_id" required>
                             {% for user in users %}
-                            <option value="{{ user.id }}">{{ user.username }}</option>
+                            <option value="{{ user.id }}" {% if user.id == current_user.id %}selected{% endif %}>{{ user.username }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     {% endif %}
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">{{ task is defined and task.id ? 'Update' : 'Create' }}</button>
+                        <button type="submit" class="btn btn-primary">{% if task is defined and task.id %}Update{% else %}Create{% endif %}</button>
                         <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
