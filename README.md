@@ -1,5 +1,6 @@
 # Task Management Application
 Full name: Kiều Trương Hàm Hương
+
 Student ID: 22719241
 A Flask-based task management application that allows users to create, manage, and track tasks.
 
@@ -13,7 +14,7 @@ A Flask-based task management application that allows users to create, manage, a
 1. Clone the repository (if you haven't already):
    ```bash
    git clone https://github.com/HamHuong/ptud-gk-de2.git
-   cd GK
+   cd ptud-gk-de2
    ```
 
 2. Running the Application
