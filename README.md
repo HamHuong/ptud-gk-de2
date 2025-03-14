@@ -1,9 +1,15 @@
 # Task Management Application
-Full name: Kiều Trương Hàm Hương
-
-Student ID: 22719241
-
+## Information personal
+- Full name: Kiều Trương Hàm Hương
+- Student ID: 22719241
+## Describe:
 A Flask-based task management application that allows users to create, manage, and track tasks.
+- Task creation and management
+- Task status tracking
+- Admin dashboard
+- User authentication
+- Task completion time tracking
+
 
 ## Prerequisites
 
@@ -78,11 +84,5 @@ A Flask-based task management application that allows users to create, manage, a
    python app.py
    ```
 
-## Features
 
-- Task creation and management
-- Task status tracking
-- Admin dashboard
-- User authentication
-- Task completion time tracking
 
