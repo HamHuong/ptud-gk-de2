@@ -1,5 +1,6 @@
 # Task Management Application
-
+Full name: Kiều Trương Hàm Hương
+Student ID: 22719241
 A Flask-based task management application that allows users to create, manage, and track tasks.
 
 ## Prerequisites
@@ -12,7 +13,7 @@ A Flask-based task management application that allows users to create, manage, a
 1. Clone the repository (if you haven't already):
    ```bash
    git clone https://github.com/HamHuong/ptud-gk-de2.git
-   cd ptud-gk-de2
+   cd GK
    ```
 
 2. Running the Application
@@ -82,11 +83,3 @@ A Flask-based task management application that allows users to create, manage, a
 - User authentication
 - Task completion time tracking
 
-## Troubleshooting
-
-If you encounter any issues:
-
-1. Make sure Python 3.x is installed and added to your system PATH
-2. Ensure all dependencies are properly installed
-3. Check if the virtual environment is activated
-4. Verify that the database is properly initialized
