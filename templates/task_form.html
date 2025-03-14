@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">{{ task is defined and task.id ? 'Edit Task' : 'New Task' }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ task.title if task is defined else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ task.description if task is defined else '' }}</textarea>
+                    </div>
+                    {% if task is defined %}
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="pending" {{ 'selected' if task.status == 'pending' else '' }}>Pending</option>
+                            <option value="in_progress" {{ 'selected' if task.status == 'in_progress' else '' }}>In Progress</option>
+                            <option value="completed" {{ 'selected' if task.status == 'completed' else '' }}>Completed</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="due_time" class="form-label">Due Time</label>
+                        <input type="datetime-local" class="form-control" id="due_time" name="due_time" 
+                               value="{{ task.due_time.strftime('%Y-%m-%dT%H:%M') if task is defined and task.due_time else '' }}" required>
+                    </div>
+                    {% if current_user.is_admin and not task %}
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">Assign To</label>
+                        <select class="form-select" id="user_id" name="user_id" required>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">{{ task is defined and task.id ? 'Update' : 'Create' }}</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
