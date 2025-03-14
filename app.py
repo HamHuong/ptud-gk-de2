@@ -136,6 +136,17 @@ def delete_task(task_id):
         db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/task/<int:task_id>/complete')
+@login_required
+def complete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if current_user.is_admin or task.user_id == current_user.id:
+        task.status = 'completed'
+        task.finished_time = datetime.utcnow()
+        db.session.commit()
+        flash('Task marked as completed!', 'success')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

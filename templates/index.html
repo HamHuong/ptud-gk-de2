@@ -14,9 +14,18 @@
         <div class="card h-100 {% if task.is_overdue %}border-danger{% endif %}">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">{{ task.title }}</h5>
-                <span class="badge {% if task.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">
-                    {{ task.status }}
-                </span>
+                <div class="d-flex align-items-center gap-2">
+                    {% if task.status == 'pending' %}
+                    <a href="{{ url_for('complete_task', task_id=task.id) }}" 
+                       class="btn btn-success btn-sm"
+                       onclick="return confirm('Mark this task as completed?')">
+                        Complete
+                    </a>
+                    {% endif %}
+                    <span class="badge {% if task.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ task.status }}
+                    </span>
+                </div>
             </div>
             <div class="card-body">
                 <p class="card-text">{{ task.description }}</p>
