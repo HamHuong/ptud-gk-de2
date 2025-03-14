@@ -43,6 +43,7 @@ A Flask-based task management application that allows users to create, manage, a
    - Default admin credentials:
      - Username: admin
      - Password: admin123
+     - Function: Admin manager task that user create
 
 ## Manual Setup (if scripts don't work)
 
